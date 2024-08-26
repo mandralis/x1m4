@@ -1,0 +1,13 @@
+**/rosbag2*
+**/c_generated_code
+**/*.json
+**/_l4c_generated
+**/__pycache__
+**/log
+**/build
+**/install
+**/acados_models
+**/acados_sims
+**/learned_models
+**/data
+**/*.c
