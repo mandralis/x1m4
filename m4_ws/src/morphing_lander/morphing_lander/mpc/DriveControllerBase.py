@@ -6,7 +6,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 
 # Message imports
-from custom_msgs.msg import DriveVel
+from m4_custom_msgs.msg import DriveVel
 
 # Morphing Lander imports
 from morphing_lander.mpc.parameters import params_

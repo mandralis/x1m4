@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(custom_msgs)
+project(m4_custom_msgs)
 
 # Default to C++14
 if(NOT CMAKE_CXX_STANDARD)
