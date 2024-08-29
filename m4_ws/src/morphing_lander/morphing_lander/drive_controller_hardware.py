@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 
-from px4_msgs.msg import InputRc
+from custom_msgs.msg import InputRc
 
 # roboclaw and jetson
 from morphing_lander.mpc.DriveControllerBase import DriveControllerBase

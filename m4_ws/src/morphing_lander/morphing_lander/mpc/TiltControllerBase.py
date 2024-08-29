@@ -6,7 +6,7 @@ from rclpy.node import Node
 from rclpy.qos import qos_profile_sensor_data
 
 # Message imports
-from px4_msgs.msg import TiltAngle
+from custom_msgs.msg import TiltAngle
 from custom_msgs.msg import TiltVel
 
 # Morphing Lander imports

@@ -14,6 +14,8 @@ find_package(rosidl_default_generators REQUIRED)
 rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/TiltVel.msg"
   "msg/DriveVel.msg"
+  "msg/InputRc.msg"
+  "msg/TiltAngle.msg"
 )
 
 ament_package()
