@@ -18,6 +18,7 @@ max                    = params_['max']
 dead                   = params_['dead']
 Ts                     = params_.get('Ts_tilt_controller')
 tilt_roboclaw_address  = params_.get('tilt_roboclaw_address')
+max_duty               = params_.get('max_duty')
 
 class TiltHardware(TiltControllerBase):
     def __init__(self):
@@ -48,10 +49,10 @@ class TiltHardware(TiltControllerBase):
         self.rc.Open()
 
         # Set encoder count to zero (always start robot in drive configuration)
-        self.rc.SetEncM2(self.address,0)
+        self.rc.SetEncM1(self.address,0)
         self.reset_encoder = 0
 
-        # Set pin functions for motor 2 (M2) to go to zero when it reaches home (limit switch)
+        # Set pin functions for motor 2 (M1) to go to zero when it reaches home (limit switch)
         self.rc.SetPinFunctions(self.address,0x00,0x62,0x62)
 
         # Encoder data for tilt angle publishing (manually converting between data which was collected for encoder 44 from pololu to encoder 45. I should recalibrate)
@@ -78,28 +79,28 @@ class TiltHardware(TiltControllerBase):
         return (LS_in-self.dead)/(self.max-self.dead)
 
     def map_speed(self,speed_normalized):
-        return int(127*speed_normalized)
+        return int(max_duty*speed_normalized)
 
     def stop(self):
-        self.rc.ForwardM2(self.address,self.map_speed(0.0))
+        self.rc.DutyM1(self.address,self.map_speed(0.0))
 
     def spin_motor(self, tilt_speed):
         # takes in a tilt_speed between -1 and 1 writes the pwm signal to the roboclaw 
 
-        # limit speed when reaching the limit tilt angle
-        if (self.tilt_angle < self.limit_tilt):
-            if (tilt_speed < 0) : tilt_speed = 0.0
-            else: pass  
+        # # limit speed when reaching the limit tilt angle
+        # if (self.tilt_angle < self.limit_tilt):
+        #     if (tilt_speed < 0) : tilt_speed = 0.0
+        #     else: pass  
 
         motor_speed = self.map_speed(abs(tilt_speed))
         if (tilt_speed < 0): # go up
-            if motor_speed >= 127: 
-                motor_speed = 126 # weird bug not sure why this is needed
-            self.rc.ForwardM2(self.address, motor_speed)
+            if motor_speed >= max_duty: 
+                motor_speed = max_duty-1 # weird bug not sure why this is needed
+            self.rc.DutyM1(self.address, motor_speed)
         else:
-            if motor_speed >= 127:
-                motor_speed = 126
-            self.rc.BackwardM2(self.address, motor_speed)
+            if motor_speed >= max_duty:
+                motor_speed = max_duty-1
+            self.rc.DutyM1(self.address, -motor_speed)
 
     def on_shutdown(self):
         self.stop()
@@ -108,11 +109,11 @@ class TiltHardware(TiltControllerBase):
 
     def reset_encoder_trigger(self):
         if (self.reset_encoder == self.max):
-            self.rc.SetEncM2(self.address,0)
+            self.rc.SetEncM1(self.address,0)
 
     def get_current_tilt_angle(self):
         # compute and print current tilt angle
-        enc_count = self.rc.ReadEncM2(self.address)
+        enc_count = self.rc.ReadEncM1(self.address)
         self.tilt_angle =  float(interp(enc_count[1],self.encoder_data,self.angle_data))
         print(f"tilt angle is: {rad2deg(self.tilt_angle)}")
         # print(f"encoder count is: {enc_count}")
@@ -123,6 +124,8 @@ class TiltHardware(TiltControllerBase):
             # manual control of tilt angle
             u = self.normalize(self.LS_in)
             self.spin_motor(u)
+            print(f"[manual] u : {u}")
+
         else:
             self.spin_motor(self.tilt_vel)
 

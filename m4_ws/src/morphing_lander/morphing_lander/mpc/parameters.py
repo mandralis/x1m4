@@ -13,6 +13,7 @@ params_['queue_size']            = 1                              # queue size o
 # roboclaw addresses
 params_['tilt_roboclaw_address']         = "/dev/ttyACM1"
 params_['drive_roboclaw_address']        = "/dev/ttyACM0"
+params_['max_duty']                      = 32767
 
 # rc inputs
 params_['min']                           = 1094

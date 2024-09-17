@@ -24,7 +24,7 @@ tmux select-pane -t 0
 
 # reset roboclaw
 tmux send-keys -t robot:0.0 './reset_roboclaw.sh' C-m
-tmux send-keys -t robot:0.0 'm4version2' C-m
+tmux send-keys -t robot:0.0 'x1m4' C-m
 
 sleep 1
 
