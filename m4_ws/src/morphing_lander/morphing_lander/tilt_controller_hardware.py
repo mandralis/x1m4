@@ -19,6 +19,9 @@ dead                   = params_['dead']
 Ts                     = params_.get('Ts_tilt_controller')
 tilt_roboclaw_address  = params_.get('tilt_roboclaw_address')
 max_duty               = params_.get('max_duty')
+tilt_channel           = params_.get('tilt_channel')
+encoder_channel        = params_.get('encoder_channel')
+manual_channel         = params_.get('manual_channel')
 
 class TiltHardware(TiltControllerBase):
     def __init__(self):
@@ -64,13 +67,13 @@ class TiltHardware(TiltControllerBase):
 
     def rc_listener_callback(self, msg):
         # https://futabausa.com/wp-content/uploads/2018/09/18SZ.pdf
-        self.LS_in = msg.values[9] # corresponds to LS trim selector on futaba T18SZ that I configured in the function menu
+        self.LS_in = msg.values[tilt_channel] # corresponds to LS trim selector on futaba T18SZ that I configured in the function menu
 
         # reset encoder 
-        self.reset_encoder = msg.values[12]
+        self.reset_encoder = msg.values[encoder_channel]
 
         # set manual or automatic control of tilt angle
-        if msg.values[7] == self.max:
+        if msg.values[manual_channel] == self.max:
             self.manual = False
         else:
             self.manual = True

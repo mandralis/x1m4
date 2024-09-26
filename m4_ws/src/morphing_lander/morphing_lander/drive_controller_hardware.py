@@ -18,6 +18,9 @@ dead                   = params_.get('dead')
 Ts                     = params_.get('Ts_drive_controller')
 drive_roboclaw_address = params_.get('drive_roboclaw_address')
 max_duty               = params_.get('max_duty')
+manual_channel         = params_.get('manual_channel')
+drive_speed_channel    = params_.get('drive_speed_channel')
+turn_speed_channel     = params_.get('turn_speed_channel')
 
 class DriveControllerHardware(DriveControllerBase):
     def __init__(self): 
@@ -43,11 +46,11 @@ class DriveControllerHardware(DriveControllerBase):
         self.rc.Open()
 
     def rc_listener_callback(self, msg):
-        self.drive_speed_in  = msg.values[1]
-        self.turn_speed_in   = msg.values[0]
+        self.drive_speed_in  = msg.values[drive_speed_channel]
+        self.turn_speed_in   = msg.values[turn_speed_channel]
 
         # set manual or automatic control of tilt angle
-        if msg.values[7] == max:
+        if msg.values[manual_channel] == max:
             self.manual = False
         else:
             self.manual = True
@@ -87,20 +90,20 @@ class DriveControllerHardware(DriveControllerBase):
         turning_gain = 1.0
         if (self.manual):
             # manual control of driving
-            lin_vel = self.map_speed(motion_gain*self.normalize(self.drive_speed_in))
+            lin_vel = -self.map_speed(motion_gain*self.normalize(self.drive_speed_in))
             ang_vel = self.map_speed(turning_gain*self.normalize(self.turn_speed_in))
 
             self.get_logger().info(f"lin_vel, ang_vel: ({lin_vel},{ang_vel})")
 
-            self.move_right_wheel(lin_vel + ang_vel)
-            self.move_left_wheel(lin_vel  - ang_vel)
+            self.move_right_wheel(lin_vel - ang_vel)
+            self.move_left_wheel(lin_vel  + ang_vel)
 
         else:
             # automatic control of driving
             lin_vel = -self.map_speed(self.drive_speed)
-            ang_vel = -self.map_speed(self.turn_speed)
-            self.move_right_wheel(lin_vel + ang_vel)
-            self.move_left_wheel(lin_vel - ang_vel)
+            ang_vel = self.map_speed(self.turn_speed)
+            self.move_right_wheel(lin_vel - ang_vel)
+            self.move_left_wheel(lin_vel + ang_vel)
      
 def main(args=None):
     rclpy.init(args=args)

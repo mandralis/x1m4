@@ -20,3 +20,11 @@ params_['min']                           = 1094
 params_['max']                           = 1934
 params_['dead']                          = 1514
 
+# rc switch numbers
+params_['tilt_channel']        = 9
+params_['encoder_channel']     = 11
+params_['manual_channel']      = 7
+params_['drive_speed_channel'] = 1
+params_['turn_speed_channel']  = 0
+
+
