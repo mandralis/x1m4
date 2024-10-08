@@ -22,6 +22,7 @@ max_duty               = params_.get('max_duty')
 tilt_channel           = params_.get('tilt_channel')
 encoder_channel        = params_.get('encoder_channel')
 manual_channel         = params_.get('manual_channel')
+arm_channel            = params_.get('arm_channel')
 
 class TiltHardware(TiltControllerBase):
     def __init__(self):
@@ -45,6 +46,9 @@ class TiltHardware(TiltControllerBase):
 
         # Manual vs automatic control
         self.manual = True
+
+        # armed or not
+        self.armed = False
 
         # Initialize roboclaw at given address
         self.address = 0x80
@@ -78,6 +82,12 @@ class TiltHardware(TiltControllerBase):
         else:
             self.manual = True
 
+        # check if armed
+        if msg.values[arm_channel] == max:
+            self.armed = True
+        else:
+            self.armed = False
+
     def normalize(self,LS_in):
         return (LS_in-self.dead)/(self.max-self.dead)
 
@@ -88,22 +98,23 @@ class TiltHardware(TiltControllerBase):
         self.rc.DutyM1(self.address,self.map_speed(0.0))
 
     def spin_motor(self, tilt_speed):
-        # takes in a tilt_speed between -1 and 1 writes the pwm signal to the roboclaw 
+        if not self.armed:
+            # takes in a tilt_speed between -1 and 1 writes the pwm signal to the roboclaw 
 
-        # # limit speed when reaching the limit tilt angle
-        # if (self.tilt_angle < self.limit_tilt):
-        #     if (tilt_speed < 0) : tilt_speed = 0.0
-        #     else: pass  
+            # # limit speed when reaching the limit tilt angle
+            # if (self.tilt_angle < self.limit_tilt):
+            #     if (tilt_speed < 0) : tilt_speed = 0.0
+            #     else: pass  
 
-        motor_speed = self.map_speed(abs(tilt_speed))
-        if (tilt_speed < 0): # go up
-            if motor_speed >= max_duty: 
-                motor_speed = max_duty-1 # weird bug not sure why this is needed
-            self.rc.DutyM1(self.address, motor_speed)
-        else:
-            if motor_speed >= max_duty:
-                motor_speed = max_duty-1
-            self.rc.DutyM1(self.address, -motor_speed)
+            motor_speed = self.map_speed(abs(tilt_speed))
+            if (tilt_speed < 0): # go up
+                if motor_speed >= max_duty: 
+                    motor_speed = max_duty-1 # weird bug not sure why this is needed
+                self.rc.DutyM1(self.address, motor_speed)
+            else:
+                if motor_speed >= max_duty:
+                    motor_speed = max_duty-1
+                self.rc.DutyM1(self.address, -motor_speed)
 
     def on_shutdown(self):
         self.stop()
