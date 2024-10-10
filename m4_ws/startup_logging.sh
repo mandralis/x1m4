@@ -15,6 +15,7 @@ tmux send-keys -t logging 'ros2 bag record \
         /fmu/out/vehicle_odometry \
         /fmu/out/sensor_combined \
         /fmu/out/vehicle_status \
+	/fmu/in/vehicle_thrust_setpoint \
         -d 300' C-m
 
 
