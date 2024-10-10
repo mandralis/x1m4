@@ -1,0 +1,10 @@
+[Unit]
+Description=Start logging on startup
+
+[Service]
+User=x1m4
+Type=forking
+ExecStartPre=/bin/bash -l -c 'exec "$@"' /home/x1m4/.bashrc
+ExecStart=/bin/bash /home/x1m4/x1m4/m4_ws/startup_logging.sh
+[Install]
+WantedBy=multi-user.target
